@@ -1,0 +1,41 @@
+---
+/**
+ * Pros and cons (Caliper). Both columns must be populated — the products schema
+ * enforces at least one of each. A product with no listed drawback reads as an
+ * advertisement, and readers price that in.
+ *
+ * Colour never carries the meaning alone: a ✓/✗ glyph leads each item, so the
+ * pro/con distinction survives for colour-blind readers and in high contrast.
+ */
+interface Props {
+  pros: string[];
+  cons: string[];
+  /** Heading level for the two column titles (default h4). */
+  compact?: boolean;
+}
+const { pros, cons, compact = false } = Astro.props;
+---
+<div class:list={['grid gap-4', !compact && 'sm:grid-cols-2']}>
+  <div>
+    <h4 class="m-0 mb-2 text-sm font-bold" style="color:var(--color-pro)">What we liked</h4>
+    <ul class="m-0 grid list-none gap-1.5 p-0">
+      {pros.map((p) => (
+        <li class="flex gap-2 text-sm">
+          <span aria-hidden="true" style="color:var(--color-pro)">✓</span>
+          <span>{p}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+  <div>
+    <h4 class="m-0 mb-2 text-sm font-bold" style="color:var(--color-con)">What we didn't</h4>
+    <ul class="m-0 grid list-none gap-1.5 p-0">
+      {cons.map((c) => (
+        <li class="flex gap-2 text-sm">
+          <span aria-hidden="true" style="color:var(--color-con)">✗</span>
+          <span>{c}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>

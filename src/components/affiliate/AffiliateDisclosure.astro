@@ -1,0 +1,33 @@
+---
+/**
+ * Affiliate disclosure (Section 8). Rendered automatically ABOVE the first
+ * affiliate link on any page carrying products (BlogLayout enforces this), so
+ * it can never be forgotten. The small yellow square ties it to the buttons
+ * below, teaching the colour code before it is used.
+ *
+ * Exact wording/placement must comply with current Amazon Associates (US)
+ * policy — this is a starting point, not legal advice.
+ */
+import { DISCLOSURE_LONG } from '@lib/site';
+
+interface Props {
+  /** "banner" (full box, default) or "inline" (one quiet line). */
+  variant?: 'banner' | 'inline';
+}
+const { variant = 'banner' } = Astro.props;
+---
+{variant === 'banner' ? (
+  <aside
+    class="card flex items-start gap-3 p-3 text-sm"
+    style="border-left:4px solid var(--color-signal)"
+    aria-label="Affiliate disclosure"
+  >
+    <span class="signal-square mt-1" aria-hidden="true"></span>
+    <p class="m-0" style="color:var(--color-muted)">{DISCLOSURE_LONG}</p>
+  </aside>
+) : (
+  <p class="flex items-center gap-2 text-xs" style="color:var(--color-muted)">
+    <span class="signal-square" aria-hidden="true"></span>
+    <span>{DISCLOSURE_LONG}</span>
+  </p>
+)}

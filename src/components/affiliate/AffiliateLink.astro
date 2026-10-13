@@ -1,0 +1,56 @@
+---
+/**
+ * The ONE affiliate link component. Every affiliate CTA in the site routes
+ * through here so that `rel="sponsored nofollow noopener"`, the tracking data-*
+ * attributes, the 44px tap target, and the yellow styling can never be
+ * forgotten in Markdown or a one-off component (Section 7/8, Caliper rule).
+ *
+ * The destination URL is built at render time from the product's ASIN +
+ * marketplace + the Associates tag for the cluster (src/lib/affiliate.ts).
+ */
+import { buildAmazonUrl, AFFILIATE_REL, type LinkPosition } from '@lib/affiliate';
+import type { Product } from '@lib/content';
+
+interface Props {
+  product: Pick<Product, 'asin' | 'marketplace' | 'name'>;
+  /** Where on the page this link sits — drives the GA4 link_position dimension. */
+  position: LinkPosition;
+  /** Cluster slug, so a per-cluster Associates tracking tag can be used. */
+  cluster?: string;
+  /** Visible, honest link text. Never "click here". */
+  label?: string;
+  /** Render full-width (used inside cards/quick-picks). */
+  block?: boolean;
+}
+
+const {
+  product,
+  position,
+  cluster,
+  label = 'Check price on Amazon',
+  block = false,
+} = Astro.props;
+
+const href = buildAmazonUrl({
+  asin: product.asin,
+  marketplace: product.marketplace,
+  cluster,
+});
+
+// An accessible name that makes sense out of context (screen-reader users
+// hear "Check price on Amazon for <product>" rather than a bare label).
+const ariaLabel = `${label} for the ${product.name}`;
+---
+<a
+  class:list={['btn', 'btn-affiliate', block && 'w-full']}
+  href={href}
+  target="_blank"
+  rel={AFFILIATE_REL}
+  aria-label={ariaLabel}
+  data-affiliate
+  data-asin={product.asin}
+  data-link-position={position}
+>
+  <span class="signal-square" aria-hidden="true"></span>
+  <span>{label}</span>
+</a>

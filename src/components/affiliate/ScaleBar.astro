@@ -1,0 +1,52 @@
+---
+/**
+ * Scale bar (Caliper). Plots one measured spec on a shared scale so two
+ * products can be compared at a glance. The axis ends are labelled with the
+ * REAL range across the products tested, so a bar means something.
+ *
+ * Caliper rule: never draw a bar for a number you did not measure or cite.
+ * Enforced by requiring numeric min/max/value — pass a plain spec row to the
+ * ProductCard instead when you only have a label/value string.
+ *
+ * Bars are petrol by default and yellow-deep on the recommended product.
+ */
+interface Props {
+  label: string;
+  /** The value shown at the right (e.g. "48 dB"). */
+  displayValue: string;
+  min: number;
+  max: number;
+  value: number;
+  minLabel?: string;
+  maxLabel?: string;
+  /** Yellow-deep bar for the recommended product. */
+  recommended?: boolean;
+}
+const { label, displayValue, min, max, value, minLabel, maxLabel, recommended = false } =
+  Astro.props;
+
+const span = max - min || 1;
+const pct = Math.max(0, Math.min(100, ((value - min) / span) * 100));
+const barColor = recommended ? '#e3b70f' : 'var(--color-petrol)';
+---
+<div class="grid gap-1">
+  <div class="flex items-baseline justify-between gap-3">
+    <span class="text-sm font-medium">{label}</span>
+    <span class="text-sm font-bold" style="font-variant-numeric:tabular-nums">{displayValue}</span>
+  </div>
+  <div
+    class="relative h-2 w-full overflow-hidden"
+    style="background:var(--color-paper);border-radius:999px"
+    role="img"
+    aria-label={`${label}: ${displayValue} (range ${minLabel ?? min} to ${maxLabel ?? max})`}
+  >
+    <span
+      class="absolute inset-y-0 left-0"
+      style={`width:${pct}%;background:${barColor};border-radius:999px`}
+    ></span>
+  </div>
+  <div class="flex justify-between text-xs" style="color:var(--color-muted)">
+    <span>{minLabel ?? min}</span>
+    <span>{maxLabel ?? max}</span>
+  </div>
+</div>

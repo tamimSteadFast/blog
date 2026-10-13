@@ -1,0 +1,23 @@
+---
+/**
+ * Serializes a JSON-LD object (or an array of them) into a
+ * <script type="application/ld+json"> tag. Null/undefined entries are skipped,
+ * so callers can pass `faqPageJsonLd(faq)` (which returns null when empty)
+ * without guarding.
+ *
+ * `set:html` with JSON.stringify is safe here: the data is our own structured
+ * objects, and we escape the "<" that could otherwise break out of the script.
+ */
+interface Props {
+  schema: unknown | unknown[];
+}
+const { schema } = Astro.props;
+const items = (Array.isArray(schema) ? schema : [schema]).filter(Boolean);
+
+function serialize(obj: unknown): string {
+  return JSON.stringify(obj).replace(/</g, '\\u003c');
+}
+---
+{items.map((item) => (
+  <script type="application/ld+json" set:html={serialize(item)} />
+))}

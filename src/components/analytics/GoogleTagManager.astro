@@ -1,0 +1,26 @@
+---
+/**
+ * Google Tag Manager — the ONLY tag manager on the site (Section 5/6).
+ *
+ * Renders the official GTM <script> (for <head>) OR the <noscript> iframe (for
+ * immediately after <body>), selected by the `slot` prop. GA4 is configured
+ * *inside* GTM — we never load the gtag snippet separately, so there are no
+ * duplicate page_view events from this component.
+ *
+ * If PUBLIC_GTM_ID is empty, this renders NOTHING and never errors. A fake ID
+ * must never ship to production.
+ */
+interface Props {
+  /** "head" renders the loader script; "body" renders the noscript iframe. */
+  slot: 'head' | 'body';
+}
+const { slot } = Astro.props;
+const gtmId = import.meta.env.PUBLIC_GTM_ID?.trim();
+const enabled = Boolean(gtmId);
+---
+{enabled && slot === 'head' && (
+  <script is:inline set:html={`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${gtmId}');`} />
+)}
+{enabled && slot === 'body' && (
+  <noscript set:html={`<iframe src="https://www.googletagmanager.com/ns.html?id=${gtmId}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`} />
+)}

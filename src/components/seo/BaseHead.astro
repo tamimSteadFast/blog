@@ -1,0 +1,54 @@
+---
+/**
+ * Everything that goes in <head>: charset/viewport, title + meta description,
+ * canonical, robots, Open Graph, Twitter card, fonts, and the global stylesheet.
+ *
+ * Metadata is built in src/lib/seo.ts from Astro.site (guaranteed set by the
+ * build). Titles/descriptions over the SEO limits are warned about at build
+ * time by scripts/check-content.mjs, not here.
+ */
+import { resolveMeta, type PageMeta } from '@lib/seo';
+import { SITE } from '@lib/site';
+import '../../styles/global.css';
+
+type Props = PageMeta;
+const meta = resolveMeta(Astro.props, Astro.site);
+const fontHref =
+  'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap';
+---
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content={Astro.generator} />
+
+<title>{meta.title}</title>
+<meta name="description" content={meta.description} />
+<link rel="canonical" href={meta.canonical} />
+<meta name="robots" content={meta.robots} />
+
+<!-- Open Graph -->
+<meta property="og:type" content={meta.ogType} />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:title" content={meta.title} />
+<meta property="og:description" content={meta.description} />
+<meta property="og:url" content={meta.canonical} />
+<meta property="og:locale" content={SITE.locale.replace('-', '_')} />
+{meta.image && <meta property="og:image" content={meta.image} />}
+{meta.image && meta.imageAlt && <meta property="og:image:alt" content={meta.imageAlt} />}
+{meta.publishedTime && <meta property="article:published_time" content={meta.publishedTime} />}
+{meta.modifiedTime && <meta property="article:modified_time" content={meta.modifiedTime} />}
+{meta.author && <meta property="article:author" content={meta.author} />}
+
+<!-- Twitter -->
+<meta name="twitter:card" content={meta.image ? 'summary_large_image' : 'summary'} />
+<meta name="twitter:title" content={meta.title} />
+<meta name="twitter:description" content={meta.description} />
+{meta.image && <meta name="twitter:image" content={meta.image} />}
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href={fontHref} />
+
+<!-- Feeds + icons -->
+<link rel="alternate" type="application/rss+xml" title={`${SITE.name} RSS`} href="/rss.xml" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
