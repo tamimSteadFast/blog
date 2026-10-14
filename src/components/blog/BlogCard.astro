@@ -1,0 +1,49 @@
+---
+/**
+ * Article card (Caliper). Cover image 16:9, content-type chip, title link,
+ * standfirst, date + read time. Used on listings and in RelatedPosts.
+ */
+import { Image } from 'astro:assets';
+import type { Article } from '@lib/content';
+
+interface Props {
+  article: Article;
+  /** Eager-load the first card's image (it can be the LCP on listings). */
+  priority?: boolean;
+}
+const { article, priority = false } = Astro.props;
+const dateFmt = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' });
+const typeLabel: Record<string, string> = {
+  review: 'Review',
+  comparison: 'Comparison',
+  roundup: 'Roundup',
+  guide: 'Guide',
+  news: 'News',
+};
+---
+<article class="card overflow-hidden">
+  <a href={article.href} class="block no-underline" style="color:inherit">
+    {article.coverImage ? (
+      <Image
+        src={article.coverImage}
+        alt={article.coverImageAlt ?? article.title}
+        width={720}
+        height={405}
+        loading={priority ? 'eager' : 'lazy'}
+        class="aspect-video w-full object-cover"
+      />
+    ) : (
+      <div class="flex aspect-video w-full items-center justify-center text-xs" style="background:var(--color-paper);color:var(--color-muted)">
+        Cover image, 16:9
+      </div>
+    )}
+    <div class="grid gap-2 p-4">
+      <span class="chip w-fit">{typeLabel[article.contentType] ?? article.contentType}</span>
+      <h3 class="m-0 text-lg" style="color:var(--color-ink)">{article.title}</h3>
+      <p class="m-0 text-sm" style="color:var(--color-muted)">{article.description}</p>
+      <p class="m-0 text-xs" style="color:var(--color-muted)">
+        {dateFmt.format(article.pubDate)} · {article.readingTimeMinutes} min read
+      </p>
+    </div>
+  </a>
+</article>

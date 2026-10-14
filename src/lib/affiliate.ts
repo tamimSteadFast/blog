@@ -38,7 +38,7 @@ function parseClusterTags(): Record<string, string> {
   const raw = import.meta.env.PUBLIC_AMAZON_TAGS_BY_CLUSTER || '';
   const map: Record<string, string> = {};
   for (const pair of raw.split(',')) {
-    const [cluster, tag] = pair.split(':').map((s) => s.trim());
+    const [cluster, tag] = pair.split(':').map((s: string) => s.trim());
     if (cluster && tag) map[cluster] = tag;
   }
   return map;

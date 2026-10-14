@@ -1,0 +1,49 @@
+---
+/**
+ * Individual article page. Generated from the blog collection. The article data
+ * is resolved in the data layer (content.ts) and passed to BlogLayout; the body
+ * is rendered here with render(entry) and handed to the layout via <slot>.
+ */
+import { getAllArticles, getArticleById, renderArticle, getRelatedArticles } from '@lib/content';
+import { clusterLabel } from '@lib/clusters';
+import { blogPostingJsonLd, breadcrumbJsonLd, faqPageJsonLd } from '@lib/seo';
+import BlogLayout from '@layouts/BlogLayout.astro';
+import type { Crumb } from '@components/layout/Breadcrumbs.astro';
+
+export async function getStaticPaths() {
+  const articles = await getAllArticles();
+  return articles.map((article) => ({
+    params: { slug: article.id },
+    props: { id: article.id },
+  }));
+}
+
+const { id } = Astro.props;
+const article = await getArticleById(id);
+if (!article) return Astro.redirect('/404/');
+
+const { Content, headings } = await renderArticle(id);
+const relatedArticles = await getRelatedArticles(article);
+
+const crumbs: Crumb[] = [
+  { name: 'Home', href: '/' },
+  { name: clusterLabel(article.category), href: `/category/${article.category}/` },
+  { name: article.title, href: article.href },
+];
+
+// FAQPage is emitted ONLY when the FAQ is non-empty (and therefore rendered).
+const jsonLd = [
+  blogPostingJsonLd(article, Astro.site),
+  breadcrumbJsonLd(crumbs, Astro.site),
+  faqPageJsonLd(article.faq),
+];
+---
+<BlogLayout
+  article={article}
+  headings={headings}
+  relatedArticles={relatedArticles}
+  crumbs={crumbs}
+  jsonLd={jsonLd}
+>
+  <Content />
+</BlogLayout>

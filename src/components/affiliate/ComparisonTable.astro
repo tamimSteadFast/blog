@@ -1,0 +1,66 @@
+---
+/**
+ * Comparison table (Caliper). A REAL <table> with scoped headers, scrolling
+ * inside its own container on mobile so the page never moves sideways. The
+ * recommended row is tinted (not bolded) so the data stays readable.
+ *
+ * Columns are the union of the products' key-spec labels (in first-seen order),
+ * plus Model, Best for, and a CTA that routes through AffiliateLink.
+ */
+import type { Product } from '@lib/content';
+import AffiliateLink from './AffiliateLink.astro';
+
+interface Props {
+  products: Product[];
+  cluster?: string;
+  /** id of the recommended product, for the tinted row. */
+  recommendedId?: string;
+  caption?: string;
+}
+const { products, cluster, recommendedId, caption } = Astro.props;
+
+// Union of spec labels, preserving first-seen order.
+const specLabels: string[] = [];
+for (const p of products) {
+  for (const s of p.keySpecs) {
+    if (!specLabels.includes(s.label)) specLabels.push(s.label);
+  }
+}
+function specValue(p: Product, label: string): string {
+  return p.keySpecs.find((s) => s.label === label)?.value ?? '—';
+}
+---
+<div class="w-full overflow-x-auto" style="border-radius:var(--radius-card)">
+  <table class="card w-full border-collapse text-sm" style="min-width:36rem">
+    {caption && <caption class="p-3 text-left text-sm" style="color:var(--color-muted)">{caption}</caption>}
+    <thead>
+      <tr style="border-bottom:1px solid var(--color-rule)">
+        <th scope="col" class="p-3 text-left">Model</th>
+        {specLabels.map((label) => (
+          <th scope="col" class="p-3 text-left whitespace-nowrap">{label}</th>
+        ))}
+        <th scope="col" class="p-3 text-left">Best for</th>
+        <th scope="col" class="p-3 text-left"><span class="sr-only">Buy</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {products.map((p) => {
+        const isRec = p.id === recommendedId;
+        return (
+          <tr
+            style={`border-bottom:1px solid var(--color-rule);${isRec ? 'background:color-mix(in srgb, var(--color-signal) 14%, var(--color-surface))' : ''}`}
+          >
+            <th scope="row" class="p-3 text-left font-semibold">{p.name}</th>
+            {specLabels.map((label) => (
+              <td class="p-3" style="font-variant-numeric:tabular-nums">{specValue(p, label)}</td>
+            ))}
+            <td class="p-3" style="color:var(--color-muted)">{p.bestFor}</td>
+            <td class="p-3">
+              <AffiliateLink product={p} position="comparison_table" cluster={cluster} label="Check price" />
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+</div>

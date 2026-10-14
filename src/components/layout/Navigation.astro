@@ -1,0 +1,28 @@
+---
+/**
+ * Primary navigation links. Real <a href> elements (crawlable, work without
+ * JS). Marks the current section with aria-current.
+ */
+import { NAV } from '@lib/site';
+
+interface Props {
+  pathname: string;
+}
+const { pathname } = Astro.props;
+const isCurrent = (href: string) =>
+  href === '/' ? pathname === '/' : pathname.startsWith(href);
+---
+<ul class="m-0 flex list-none flex-col gap-1 p-0 sm:flex-row sm:items-center sm:gap-5">
+  {NAV.map((item) => (
+    <li>
+      <a
+        href={item.href}
+        class="block py-1 font-medium no-underline"
+        style={isCurrent(item.href) ? 'color:var(--color-petrol);text-decoration:underline' : 'color:var(--color-ink)'}
+        aria-current={isCurrent(item.href) ? 'page' : undefined}
+      >
+        {item.label}
+      </a>
+    </li>
+  ))}
+</ul>

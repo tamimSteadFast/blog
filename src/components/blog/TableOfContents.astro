@@ -1,0 +1,58 @@
+---
+/**
+ * Table of contents, generated from the article's Markdown headings (the
+ * `headings` returned by render()). h2 and h3 only. Highlights the current
+ * section with a small IntersectionObserver scrollspy (degrades gracefully —
+ * the links work with no JS).
+ */
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+const { headings } = Astro.props;
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+{toc.length > 0 && (
+  <nav class="toc text-sm" aria-label="Table of contents">
+    <h2 class="m-0 mb-2 text-xs uppercase tracking-wide" style="color:var(--color-muted)">On this page</h2>
+    <ul class="m-0 grid list-none gap-1 p-0">
+      {toc.map((h) => (
+        <li style={h.depth === 3 ? 'padding-left:0.85rem' : ''}>
+          <a href={`#${h.slug}`} data-toc-link={h.slug} class="toc-link no-underline" style="color:var(--color-muted)">
+            {h.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<style>
+  .toc-link[aria-current='true'] {
+    color: var(--color-petrol);
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
+  if (links.length && 'IntersectionObserver' in window) {
+    const bySlug = new Map(links.map((l) => [l.dataset.tocLink, l]));
+    const headings = links
+      .map((l) => document.getElementById(l.dataset.tocLink || ''))
+      .filter((el): el is HTMLElement => Boolean(el));
+    const setCurrent = (slug: string) => {
+      links.forEach((l) => l.removeAttribute('aria-current'));
+      bySlug.get(slug)?.setAttribute('aria-current', 'true');
+    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length) setCurrent(visible[0].target.id);
+      },
+      { rootMargin: '-10% 0px -70% 0px', threshold: 0 }
+    );
+    headings.forEach((h) => io.observe(h));
+  }
+</script>

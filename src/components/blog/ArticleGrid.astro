@@ -1,0 +1,21 @@
+---
+/**
+ * Responsive grid of article cards. The first card is eager-loaded (it is the
+ * likely LCP on a listing page).
+ */
+import type { Article } from '@lib/content';
+import BlogCard from './BlogCard.astro';
+
+interface Props {
+  articles: Article[];
+  emptyMessage?: string;
+}
+const { articles, emptyMessage = 'No articles yet — check back soon.' } = Astro.props;
+---
+{articles.length === 0 ? (
+  <p style="color:var(--color-muted)">{emptyMessage}</p>
+) : (
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {articles.map((a, i) => <BlogCard article={a} priority={i === 0} />)}
+  </div>
+)}

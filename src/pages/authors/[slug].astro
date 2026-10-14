@@ -1,0 +1,50 @@
+---
+/**
+ * Author page (E-E-A-T, Section 3D). Lists the author's articles and emits
+ * Person JSON-LD, which BlogPosting.author links back to.
+ */
+import { getAllAuthors, getArticlesByAuthor, getAuthor } from '@lib/content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/layout/Breadcrumbs.astro';
+import type { Crumb } from '@components/layout/Breadcrumbs.astro';
+import ArticleGrid from '@components/blog/ArticleGrid.astro';
+import AuthorBox from '@components/blog/AuthorBox.astro';
+import { personJsonLd, breadcrumbJsonLd } from '@lib/seo';
+import { clusterLabel } from '@lib/clusters';
+import { SITE } from '@lib/site';
+
+export async function getStaticPaths() {
+  const authors = await getAllAuthors();
+  return authors.map((a) => ({ params: { slug: a.id } }));
+}
+
+const id = Astro.params.slug!;
+const author = await getAuthor(id);
+if (!author) return Astro.redirect('/404/');
+const items = (await getArticlesByAuthor(id)).filter((a) => !a.noindex);
+
+const crumbs: Crumb[] = [
+  { name: 'Home', href: '/' },
+  { name: author.name, href: author.href },
+];
+
+const meta = {
+  title: `${author.name} — ${SITE.name}`,
+  description: author.bio.slice(0, 160),
+  path: author.href,
+};
+const jsonLd = [personJsonLd(author, Astro.site), breadcrumbJsonLd(crumbs, Astro.site)];
+---
+<BaseLayout meta={meta} jsonLd={jsonLd}>
+  <div class="grid gap-6">
+    <Breadcrumbs crumbs={crumbs} />
+    <AuthorBox author={author} />
+    {author.expertise.length > 0 && (
+      <p class="m-0 text-sm" style="color:var(--color-muted)">
+        Covers {author.expertise.map((e) => clusterLabel(e)).join(', ')}.
+      </p>
+    )}
+    <h2 class="m-0 text-xl">Articles by {author.name}</h2>
+    <ArticleGrid articles={items} emptyMessage="No published articles yet." />
+  </div>
+</BaseLayout>

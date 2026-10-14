@@ -1,0 +1,24 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { SITE } from '@lib/site';
+const meta = {
+  title: `Contact — ${SITE.name}`,
+  description: 'How to reach Caliper Air with questions, corrections, or feedback.',
+  path: '/contact/',
+};
+---
+<BaseLayout meta={meta}>
+  <article class="prose">
+    <h1>Contact</h1>
+    <p>
+      The fastest way to reach us is by email. We read corrections especially closely — if a
+      number on this site is wrong or out of date, tell us and we'll fix it.
+    </p>
+    <p>
+      <strong>Email:</strong> <a href="mailto:hello@example.com">hello@example.com</a>
+    </p>
+    <p style="color:var(--color-muted)">
+      Replace this placeholder address with your real contact details before launch.
+    </p>
+  </article>
+</BaseLayout>

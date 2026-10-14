@@ -13,15 +13,25 @@ import tailwindcss from '@tailwindcss/vite';
 const PLACEHOLDER_SITE = 'https://example.com';
 const site = process.env.PUBLIC_SITE_URL || PLACEHOLDER_SITE;
 
-if (process.env.NODE_ENV === 'production' || process.env.CI) {
-  if (!process.env.PUBLIC_SITE_URL || site === PLACEHOLDER_SITE) {
-    throw new Error(
-      '[astro.config] `site` is not configured. Set PUBLIC_SITE_URL to the ' +
-        'production origin (e.g. https://purifierpicks.com) before building for ' +
-        'production. Canonical URLs, the sitemap, and RSS depend on it.'
-    );
-  }
-}
+/**
+ * Fail the BUILD loudly (but not dev/check) when `site` is missing or still the
+ * placeholder. Canonical URLs, the sitemap, and RSS all depend on a real origin.
+ * Runs in astro:build:start so local `astro dev` and `astro check` are unaffected.
+ */
+const requireRealSite = {
+  name: 'caliper:require-real-site',
+  hooks: {
+    'astro:build:start': () => {
+      if (!process.env.PUBLIC_SITE_URL || site === PLACEHOLDER_SITE) {
+        throw new Error(
+          '[astro.config] `site` is not configured. Set PUBLIC_SITE_URL to the ' +
+            'production origin (e.g. https://purifierpicks.com) before building ' +
+            'for production. Canonical URLs, the sitemap, and RSS depend on it.'
+        );
+      }
+    },
+  },
+};
 
 // https://astro.build/config
 export default defineConfig({
@@ -37,6 +47,7 @@ export default defineConfig({
     format: 'directory',
   },
   integrations: [
+    requireRealSite,
     mdx(),
     sitemap({
       // Drafts, noindex pages, and paginated duplicates are filtered out.

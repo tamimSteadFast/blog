@@ -1,0 +1,119 @@
+---
+/**
+ * Article template — the Caliper article anatomy. The ORDER is the point: a
+ * ready-to-buy reader reaches a working link within one scroll (verdict →
+ * quick picks), and the reasoning sits underneath for anyone who wants it.
+ *
+ *   Breadcrumb → Title/byline → Disclosure → Verdict → Quick picks →
+ *   Comparison table → [prose + product cards | sticky TOC] → FAQ →
+ *   Author box → Related.
+ *
+ * The disclosure, author box, FAQ, and related links are rendered AUTOMATICALLY
+ * from the resolved article data, so they can never be forgotten in Markdown.
+ * All conversion blocks route their CTAs through AffiliateLink.
+ */
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '@components/layout/Breadcrumbs.astro';
+import type { Crumb } from '@components/layout/Breadcrumbs.astro';
+import ArticleHeader from '@components/blog/ArticleHeader.astro';
+import TableOfContents from '@components/blog/TableOfContents.astro';
+import RelatedPosts from '@components/blog/RelatedPosts.astro';
+import AuthorBox from '@components/blog/AuthorBox.astro';
+import FaqSection from '@components/blog/FaqSection.astro';
+import AffiliateDisclosure from '@components/affiliate/AffiliateDisclosure.astro';
+import Verdict from '@components/affiliate/Verdict.astro';
+import QuickPicks from '@components/affiliate/QuickPicks.astro';
+import ComparisonTable from '@components/affiliate/ComparisonTable.astro';
+import ProductCard from '@components/affiliate/ProductCard.astro';
+import type { Article } from '@lib/content';
+import type { MarkdownHeading } from 'astro';
+import type { PageMeta } from '@lib/seo';
+
+interface Props {
+  article: Article;
+  headings: MarkdownHeading[];
+  relatedArticles: Article[];
+  crumbs: Crumb[];
+  jsonLd: unknown[];
+}
+const { article, headings, relatedArticles, crumbs, jsonLd } = Astro.props;
+
+const meta: PageMeta = {
+  title: article.title,
+  description: article.description,
+  path: article.href,
+  canonicalOverride: article.canonicalURL,
+  noindex: article.noindex,
+  ogType: 'article',
+  image: article.coverImage?.src,
+  imageAlt: article.coverImageAlt,
+  publishedTime: article.pubDate,
+  modifiedTime: article.updatedDate ?? article.pubDate,
+  author: article.author.name,
+};
+
+const hasAffiliate = article.products.length > 0 || article.picks.length > 0;
+const showComparison = article.products.length >= 2;
+
+// Product cards with their editorial role (from picks) and recommended flag.
+const roleByProductId = new Map(article.picks.map((p) => [p.product.id, p.role]));
+const cards = article.products.map((product) => ({
+  product,
+  role: roleByProductId.get(product.id),
+  recommended: product.id === article.recommendedProductId,
+}));
+---
+<BaseLayout meta={meta} jsonLd={jsonLd}>
+  <article class="grid gap-8">
+    <Breadcrumbs crumbs={crumbs} />
+    <ArticleHeader article={article} />
+
+    {hasAffiliate && <AffiliateDisclosure />}
+    {article.verdict && (
+      <Verdict verdict={article.verdict} lastReviewed={article.lastReviewed} />
+    )}
+    {article.picks.length > 0 && (
+      <QuickPicks picks={article.picks} cluster={article.cluster} />
+    )}
+    {showComparison && (
+      <ComparisonTable
+        products={article.products}
+        cluster={article.cluster}
+        recommendedId={article.recommendedProductId}
+        caption="How the units we tested compare."
+      />
+    )}
+
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_15rem]">
+      <div class="grid min-w-0 gap-8">
+        <div class="prose"><slot /></div>
+
+        {cards.length > 0 && (
+          <section aria-labelledby="products-heading" class="grid gap-4">
+            <h2 id="products-heading" class="m-0 text-xl">The units we tested</h2>
+            <div class="grid gap-4 sm:grid-cols-2">
+              {cards.map((c) => (
+                <ProductCard
+                  product={c.product}
+                  cluster={article.cluster}
+                  role={c.role}
+                  recommended={c.recommended}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+
+      <aside class="hidden lg:block">
+        <div class="sticky top-6">
+          <TableOfContents headings={headings} />
+        </div>
+      </aside>
+    </div>
+
+    <FaqSection faq={article.faq} />
+    <AuthorBox author={article.author} />
+    <RelatedPosts articles={relatedArticles} />
+  </article>
+</BaseLayout>

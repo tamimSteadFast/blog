@@ -1,0 +1,54 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { SITE } from '@lib/site';
+const meta = {
+  title: `Editorial policy — ${SITE.name}`,
+  description: 'How we select, test, and assess products — and how affiliate links work.',
+  path: '/editorial-policy/',
+};
+---
+<BaseLayout meta={meta}>
+  <article class="prose">
+    <h1>Editorial policy</h1>
+    <p>
+      This page explains how {SITE.name} chooses and assesses products, and how the affiliate
+      links on the site work. If anything here and a review ever disagree, this page wins —
+      tell us and we'll fix the review.
+    </p>
+
+    <h2>How we select products</h2>
+    <p>
+      We start from the buyer, not the brand. For a given room size and budget we shortlist the
+      units most people are actually choosing between, then narrow by the two factors that
+      decide whether a purifier stays switched on: noise on its working setting, and the
+      running cost of filters over three years.
+    </p>
+
+    <h2>How we assess them</h2>
+    <p>
+      Where we quote a measurement, we say how it was taken and over what range the comparison
+      runs. We do not print star ratings we didn't measure, and we never show a scale bar for a
+      number we didn't measure or cite. Specs sourced from a manufacturer are labelled as such.
+    </p>
+
+    <h2>What we don't do</h2>
+    <ul>
+      <li>We don't print prices. They move, and Amazon restricts where price data may come from. The button is the price check.</li>
+      <li>We don't invent review counts, availability, or ratings.</li>
+      <li>We don't publish a product card without a genuine drawback. If we didn't find one, we say what we didn't test instead.</li>
+    </ul>
+
+    <h2>Affiliate links</h2>
+    <p>
+      We earn a commission when you buy through our links, at no extra cost to you. As an
+      Amazon Associate we earn from qualifying purchases. Commissions never change which
+      product we recommend. See the <a href="/affiliate-disclosure/">full affiliate disclosure</a>.
+    </p>
+
+    <h2>Corrections</h2>
+    <p>
+      Found a number that's wrong or stale? <a href="/contact/">Email us</a>. Corrections are
+      the fastest way to earn a reader's trust, so we take them seriously.
+    </p>
+  </article>
+</BaseLayout>

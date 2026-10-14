@@ -1,0 +1,22 @@
+---
+/**
+ * Related articles — selected by cluster then tags (see getRelatedArticles in
+ * content.ts), never by date. Renders nothing when there are no relations.
+ */
+import type { Article } from '@lib/content';
+import BlogCard from './BlogCard.astro';
+
+interface Props {
+  articles: Article[];
+  heading?: string;
+}
+const { articles, heading = 'Related in this cluster' } = Astro.props;
+---
+{articles.length > 0 && (
+  <section aria-labelledby="related-heading" class="grid gap-4">
+    <h2 id="related-heading" class="m-0 text-xl">{heading}</h2>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {articles.map((a) => <BlogCard article={a} />)}
+    </div>
+  </section>
+)}

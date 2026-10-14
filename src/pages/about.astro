@@ -1,0 +1,36 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { SITE } from '@lib/site';
+const meta = {
+  title: `About — ${SITE.name}`,
+  description: 'Who runs Caliper Air, how it is funded, and why it exists.',
+  path: '/about/',
+};
+---
+<BaseLayout meta={meta}>
+  <article class="prose">
+    <h1>About {SITE.name}</h1>
+    <p>
+      {SITE.name} is an independent review site for home air purifiers. It exists for one
+      reader: someone part-way through a buying decision who does not yet have a reason to
+      trust a stranger on the internet. Everything here is built to earn that trust —
+      measurements over adjectives, and a clear verdict over a wall of hedging.
+    </p>
+    <h2>How it's funded</h2>
+    <p>
+      We earn a commission when you buy through the Amazon links on this site, at no extra
+      cost to you. As an Amazon Associate we earn from qualifying purchases. Commissions
+      never change which product we recommend — see our
+      <a href="/editorial-policy/">editorial policy</a> for exactly how products are chosen.
+    </p>
+    <h2>Who writes it</h2>
+    <p>
+      Caliper Air is written by a single author at the moment. We'd rather say that plainly
+      than invent a masthead of experts who don't exist. You can read more on the
+      author's page, linked from the bottom of every review.
+    </p>
+    <p>
+      Questions or corrections? <a href="/contact/">Get in touch</a>.
+    </p>
+  </article>
+</BaseLayout>

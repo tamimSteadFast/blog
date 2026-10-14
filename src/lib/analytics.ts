@@ -48,7 +48,7 @@ export function isAnalyticsReady(): boolean {
 export function pushEvent(payload: DataLayerEvent): void {
   try {
     if (!isAnalyticsReady()) return; // GTM not configured -> no-op
-    window.dataLayer!.push(payload);
+    window.dataLayer!.push(payload as unknown as Record<string, unknown>);
   } catch {
     // Tracking must never break the page. Swallow deliberately.
   }

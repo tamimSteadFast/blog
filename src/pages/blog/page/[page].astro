@@ -1,0 +1,57 @@
+---
+/**
+ * Blog listing pages 2..N (/blog/page/2/, /blog/page/3/, …). Page 1 is /blog/.
+ */
+import { getIndexableArticles, PAGE_SIZE } from '@lib/content';
+import type { Article } from '@lib/content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import ArticleGrid from '@components/blog/ArticleGrid.astro';
+import Pager from '@components/blog/Pager.astro';
+import { SITE } from '@lib/site';
+
+export async function getStaticPaths() {
+  const all = await getIndexableArticles();
+  const totalPages = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
+  const paths = [];
+  for (let p = 2; p <= totalPages; p++) {
+    paths.push({
+      params: { page: String(p) },
+      props: {
+        items: all.slice((p - 1) * PAGE_SIZE, p * PAGE_SIZE),
+        pageNum: p,
+        totalPages,
+      },
+    });
+  }
+  return paths;
+}
+
+interface Props {
+  items: Article[];
+  pageNum: number;
+  totalPages: number;
+}
+const { items, pageNum, totalPages } = Astro.props;
+
+const meta = {
+  title: `All reviews & guides — page ${pageNum} — ${SITE.name}`,
+  description: `Air purifier reviews and guides, page ${pageNum} of ${totalPages}.`,
+  path: `/blog/page/${pageNum}/`,
+  // Paginated pages beyond the first add little unique value; keep them out of
+  // the index but let crawlers follow through to the articles.
+  noindex: true,
+};
+
+const prevHref = pageNum === 2 ? '/blog/' : `/blog/page/${pageNum - 1}/`;
+const nextHref = pageNum < totalPages ? `/blog/page/${pageNum + 1}/` : undefined;
+---
+<BaseLayout meta={meta}>
+  <div class="grid gap-6">
+    <header class="grid gap-2">
+      <h1 class="m-0 text-2xl">All reviews & guides</h1>
+      <p class="m-0" style="color:var(--color-muted)">Page {pageNum} of {totalPages}.</p>
+    </header>
+    <ArticleGrid articles={items} />
+    <Pager current={pageNum} total={totalPages} prevHref={prevHref} nextHref={nextHref} />
+  </div>
+</BaseLayout>

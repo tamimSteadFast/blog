@@ -24,6 +24,9 @@ import type { Marketplace } from './affiliate';
 
 const DEV = import.meta.env.DEV;
 
+/** Articles per page on the blog listing. */
+export const PAGE_SIZE = 12;
+
 // ---------------------------------------------------------------------------
 // Domain types (what the rest of the app depends on — NOT raw entry types)
 // ---------------------------------------------------------------------------
@@ -81,10 +84,22 @@ export interface Article {
   secondaryKeywords: string[];
   isPillar: boolean;
   products: Product[];
+  /** id of the overall recommended product (gets the yellow highlight). */
+  recommendedProductId?: string;
+  /** Editorial quick-picks for the "If you're in a hurry" box. */
+  picks: { role: string; note?: string; product: Product; recommended: boolean }[];
   verdict?: string;
   faq: { question: string; answer: string }[];
   lastReviewed?: Date;
   draft: boolean;
+  /** Estimated reading time in whole minutes, from the raw body word count. */
+  readingTimeMinutes: number;
+}
+
+/** Rough reading time: ~225 words/min, floor of 1 minute. */
+function readingTime(body: string | undefined): number {
+  const words = (body ?? '').trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 225));
 }
 
 // ---------------------------------------------------------------------------
@@ -134,6 +149,26 @@ async function mapArticle(entry: CollectionEntry<'blog'>): Promise<Article> {
     ? await getEntries(entry.data.products)
     : [];
 
+  const recommendedProductId = entry.data.recommendedProduct?.id;
+
+  // Resolve editorial quick-picks, marking the overall recommendation.
+  const picks = await Promise.all(
+    entry.data.picks.map(async (p) => {
+      const pe = await getEntry(p.product);
+      if (!pe) {
+        throw new Error(
+          `[content] Article "${entry.id}" pick references a missing product "${p.product.id}".`
+        );
+      }
+      return {
+        role: p.role,
+        note: p.note,
+        product: mapProduct(pe),
+        recommended: pe.id === recommendedProductId,
+      };
+    })
+  );
+
   return {
     id: entry.id,
     slug: entry.id,
@@ -156,10 +191,13 @@ async function mapArticle(entry: CollectionEntry<'blog'>): Promise<Article> {
     secondaryKeywords: entry.data.secondaryKeywords,
     isPillar: entry.data.isPillar,
     products: productEntries.map(mapProduct),
+    recommendedProductId,
+    picks,
     verdict: entry.data.verdict,
     faq: entry.data.faq,
     lastReviewed: entry.data.lastReviewed,
     draft: entry.data.draft,
+    readingTimeMinutes: readingTime(entry.body),
   };
 }
 

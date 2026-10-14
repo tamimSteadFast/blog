@@ -1,0 +1,36 @@
+---
+/**
+ * Article header: the single <h1>, plus the author · published · last-reviewed
+ * byline. The cover image (when present) is the LCP, so it is eager-loaded here.
+ */
+import { Image } from 'astro:assets';
+import type { Article } from '@lib/content';
+
+interface Props {
+  article: Article;
+}
+const { article } = Astro.props;
+const dateFmt = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
+---
+<header class="grid gap-4">
+  <h1 class="m-0 text-3xl">{article.title}</h1>
+  <p class="m-0 text-sm" style="color:var(--color-muted)">
+    By <a href={article.author.href}>{article.author.name}</a>
+    · {dateFmt.format(article.pubDate)}
+    {article.updatedDate && <> · Updated {dateFmt.format(article.updatedDate)}</>}
+    {article.lastReviewed && <> · Last reviewed {dateFmt.format(article.lastReviewed)}</>}
+    · {article.readingTimeMinutes} min read
+  </p>
+  {article.coverImage && (
+    <Image
+      src={article.coverImage}
+      alt={article.coverImageAlt ?? article.title}
+      width={1120}
+      height={630}
+      loading="eager"
+      fetchpriority="high"
+      class="aspect-video w-full rounded-[var(--radius-card)] object-cover"
+      style="border:1px solid var(--color-rule)"
+    />
+  )}
+</header>

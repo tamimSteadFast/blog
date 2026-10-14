@@ -1,0 +1,41 @@
+---
+/**
+ * Site header: brand (petrol, editorial) + primary navigation. The mobile menu
+ * is a native <details>/<summary> disclosure, so it works with no JavaScript.
+ */
+import { SITE } from '@lib/site';
+import Navigation from './Navigation.astro';
+
+const pathname = Astro.url.pathname;
+---
+<header style="background:var(--color-surface);border-bottom:1px solid var(--color-rule)">
+  <div class="container-prose flex items-center justify-between gap-4 py-3">
+    <a href="/" class="flex items-baseline gap-2 no-underline" aria-label={`${SITE.name} home`}>
+      <span class="text-xl font-extrabold" style="color:var(--color-petrol)">{SITE.name}</span>
+      <span class="hidden text-xs sm:inline" style="color:var(--color-muted)">{SITE.tagline}</span>
+    </a>
+
+    <!-- Desktop nav -->
+    <nav class="hidden sm:block" aria-label="Primary">
+      <Navigation pathname={pathname} />
+    </nav>
+
+    <!-- Mobile nav: native disclosure, no JS -->
+    <details class="relative sm:hidden">
+      <summary
+        class="btn list-none"
+        style="min-height:40px"
+        aria-label="Open menu"
+      >
+        Menu
+      </summary>
+      <nav
+        class="card absolute right-0 z-20 mt-2 w-56 p-3"
+        aria-label="Primary"
+        style="box-shadow:var(--shadow-lift)"
+      >
+        <Navigation pathname={pathname} />
+      </nav>
+    </details>
+  </div>
+</header>

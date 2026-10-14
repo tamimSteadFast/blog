@@ -1,0 +1,26 @@
+---
+/**
+ * FAQ (Caliper). Native <details>/<summary>, so it works with no JavaScript.
+ * The FAQPage JSON-LD is emitted by the layout ONLY when these answers are
+ * visibly rendered here (Section 4C) — the layout and this component read the
+ * same `faq` array.
+ */
+interface Props {
+  faq: { question: string; answer: string }[];
+  heading?: string;
+}
+const { faq, heading = 'Questions' } = Astro.props;
+---
+{faq.length > 0 && (
+  <section aria-labelledby="faq-heading" class="grid gap-3">
+    <h2 id="faq-heading" class="m-0 text-xl">{heading}</h2>
+    <div class="grid gap-2">
+      {faq.map((item) => (
+        <details class="card p-4">
+          <summary class="cursor-pointer font-semibold" style="list-style:none">{item.question}</summary>
+          <p class="measure m-0 mt-2 text-sm" style="line-height:1.6">{item.answer}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+)}

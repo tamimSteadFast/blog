@@ -1,0 +1,26 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { CLUSTERS } from '@lib/clusters';
+import { SITE } from '@lib/site';
+const meta = {
+  title: `Page not found — ${SITE.name}`,
+  description: 'That page could not be found.',
+  path: '/404/',
+  noindex: true,
+};
+---
+<BaseLayout meta={meta}>
+  <div class="grid gap-5">
+    <h1 class="m-0 text-3xl">Page not found</h1>
+    <p class="measure m-0" style="color:var(--color-muted)">
+      The page you were looking for doesn't exist or has moved. Try one of these instead:
+    </p>
+    <ul class="m-0 grid list-none gap-2 p-0">
+      <li><a href="/">→ Home</a></li>
+      <li><a href="/blog/">→ All reviews & guides</a></li>
+      {CLUSTERS.map((c) => (
+        <li><a href={`/category/${c.slug}/`}>→ {c.label}</a></li>
+      ))}
+    </ul>
+  </div>
+</BaseLayout>

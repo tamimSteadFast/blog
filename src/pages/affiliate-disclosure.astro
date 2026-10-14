@@ -1,0 +1,37 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import AffiliateDisclosure from '@components/affiliate/AffiliateDisclosure.astro';
+import { SITE } from '@lib/site';
+const meta = {
+  title: `Affiliate disclosure — ${SITE.name}`,
+  description: 'How affiliate links work on Caliper Air and how the site earns commission.',
+  path: '/affiliate-disclosure/',
+};
+---
+<BaseLayout meta={meta}>
+  <article class="prose">
+    <h1>Affiliate disclosure</h1>
+    <AffiliateDisclosure />
+    <p>
+      {SITE.name} is a participant in the Amazon Services LLC Associates Program, an affiliate
+      advertising program designed to provide a means for sites to earn advertising fees by
+      advertising and linking to Amazon.com. As an Amazon Associate we earn from qualifying
+      purchases.
+    </p>
+    <p>
+      When you click a link marked as a paid link and buy something, we may receive a
+      commission. It costs you nothing extra. These commissions help fund the testing and
+      writing on this site.
+    </p>
+    <p>
+      Commissions never influence our recommendations. We link to the product we think is right
+      for the reader, and we'd make the same call if there were no commission at all. See our
+      <a href="/editorial-policy/">editorial policy</a> for how products are selected.
+    </p>
+    <p style="color:var(--color-muted)">
+      The exact wording and placement of affiliate disclosures must comply with the current
+      Amazon Associates Operating Agreement and applicable advertising law for your audience.
+      Review this page with the current policy (and, if in doubt, a professional) before launch.
+    </p>
+  </article>
+</BaseLayout>

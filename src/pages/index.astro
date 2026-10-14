@@ -1,0 +1,61 @@
+---
+/**
+ * Homepage. Carries WebSite + Organization JSON-LD (Section 4C). Leads with the
+ * positioning line, then the latest articles and a per-cluster directory.
+ */
+import { getIndexableArticles } from '@lib/content';
+import { CLUSTERS } from '@lib/clusters';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import ArticleGrid from '@components/blog/ArticleGrid.astro';
+import { websiteJsonLd, organizationJsonLd } from '@lib/seo';
+import { SITE } from '@lib/site';
+
+const latest = (await getIndexableArticles()).slice(0, 6);
+
+const meta = {
+  title: `${SITE.name} — Measurement-first air purifier reviews`,
+  description: SITE.description,
+  path: '/',
+};
+const jsonLd = [websiteJsonLd(Astro.site), organizationJsonLd(Astro.site)];
+---
+<BaseLayout meta={meta} jsonLd={jsonLd}>
+  <div class="grid gap-12">
+    <!-- Hero -->
+    <section class="grid gap-3">
+      <p class="m-0 text-sm uppercase tracking-wide" style="color:var(--color-petrol)">{SITE.name}</p>
+      <h1 class="m-0 text-3xl">Measure first. Then recommend.</h1>
+      <p class="measure m-0 text-lg" style="color:var(--color-muted)">
+        We test home air purifiers for the two things that actually decide whether you keep one
+        running: how loud it is, and what it costs to run. No invented star ratings, no printed
+        prices — just the numbers, and a clear verdict.
+      </p>
+      <div class="flex flex-wrap gap-3 pt-1">
+        <a class="btn btn-solid" href="/category/air-purifiers/">Browse reviews</a>
+        <a class="btn" href="/editorial-policy/">How we test</a>
+      </div>
+    </section>
+
+    <!-- Latest -->
+    <section class="grid gap-4">
+      <div class="flex items-baseline justify-between">
+        <h2 class="m-0 text-xl">Latest</h2>
+        <a href="/blog/" class="text-sm">All articles →</a>
+      </div>
+      <ArticleGrid articles={latest} emptyMessage="Articles are on the way." />
+    </section>
+
+    <!-- Clusters -->
+    <section class="grid gap-4">
+      <h2 class="m-0 text-xl">Browse by topic</h2>
+      <div class="grid gap-4 sm:grid-cols-2">
+        {CLUSTERS.map((c) => (
+          <a href={`/category/${c.slug}/`} class="card grid gap-1 p-5 no-underline" style="color:inherit">
+            <span class="text-lg font-bold" style="color:var(--color-petrol)">{c.label}</span>
+            <span class="text-sm" style="color:var(--color-muted)">{c.description}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+</BaseLayout>

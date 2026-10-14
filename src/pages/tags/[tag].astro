@@ -1,0 +1,48 @@
+---
+/**
+ * Tag page — generated ONLY for tags used on 3+ articles (getPopularTags), to
+ * avoid thin index pages that hurt SEO (Section 3E).
+ */
+import { getPopularTags, getArticlesByTag } from '@lib/content';
+import type { Article } from '@lib/content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/layout/Breadcrumbs.astro';
+import type { Crumb } from '@components/layout/Breadcrumbs.astro';
+import ArticleGrid from '@components/blog/ArticleGrid.astro';
+import { SITE } from '@lib/site';
+
+export async function getStaticPaths() {
+  const tags = await getPopularTags(3);
+  const paths = [];
+  for (const { tag } of tags) {
+    const items = (await getArticlesByTag(tag)).filter((a) => !a.noindex);
+    paths.push({ params: { tag }, props: { tag, items } });
+  }
+  return paths;
+}
+
+interface Props {
+  tag: string;
+  items: Article[];
+}
+const { tag, items } = Astro.props;
+
+const crumbs: Crumb[] = [
+  { name: 'Home', href: '/' },
+  { name: 'All articles', href: '/blog/' },
+  { name: `#${tag}`, href: `/tags/${tag}/` },
+];
+
+const meta = {
+  title: `Tagged “${tag}” — ${SITE.name}`,
+  description: `Air purifier articles tagged ${tag}.`,
+  path: `/tags/${tag}/`,
+};
+---
+<BaseLayout meta={meta}>
+  <div class="grid gap-6">
+    <Breadcrumbs crumbs={crumbs} />
+    <h1 class="m-0 text-2xl">Tagged “{tag}”</h1>
+    <ArticleGrid articles={items} />
+  </div>
+</BaseLayout>

@@ -1,0 +1,41 @@
+---
+/**
+ * The base HTML document shared by every page. Owns <head> (via BaseHead), GTM
+ * (head script + body noscript), the skip link, header, footer, and the single
+ * affiliate-tracking listener. Page-specific JSON-LD is passed in and rendered
+ * once here.
+ */
+import BaseHead from '@components/seo/BaseHead.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import GoogleTagManager from '@components/analytics/GoogleTagManager.astro';
+import AffiliateTracking from '@components/analytics/AffiliateTracking.astro';
+import Header from '@components/layout/Header.astro';
+import Footer from '@components/layout/Footer.astro';
+import { SITE } from '@lib/site';
+import type { PageMeta } from '@lib/seo';
+
+interface Props {
+  meta: PageMeta;
+  /** JSON-LD objects (or nulls, which are skipped) for this page. */
+  jsonLd?: unknown[];
+}
+const { meta, jsonLd = [] } = Astro.props;
+---
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <BaseHead {...meta} />
+    <GoogleTagManager placement="head" />
+    {jsonLd.length > 0 && <JsonLd schema={jsonLd} />}
+  </head>
+  <body>
+    <GoogleTagManager placement="body" />
+    <a href="#main" class="skip-link">Skip to content</a>
+    <Header />
+    <main id="main" class="container-prose py-8">
+      <slot />
+    </main>
+    <Footer />
+    <AffiliateTracking />
+  </body>
+</html>

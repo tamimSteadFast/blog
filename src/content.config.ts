@@ -14,7 +14,8 @@
  * authors (E-E-A-T). Affiliate product data lives in `products`, never inline
  * in article prose, so an ASIN or tag changes in one file instead of twenty.
  */
-import { defineCollection, reference, z } from 'astro:content';
+import { defineCollection, reference } from 'astro:content';
+import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
 import { CLUSTER_SLUGS } from './lib/clusters';
 
@@ -44,7 +45,7 @@ const blog = defineCollection({
       coverImageAlt: z.string().optional(),
 
       // --- Indexing / canonical ---
-      canonicalURL: z.string().url().optional(),
+      canonicalURL: z.url().optional(),
       noindex: z.boolean().default(false),
 
       // --- Search-intent / content model (v2) ---
@@ -57,6 +58,20 @@ const blog = defineCollection({
 
       // --- Affiliate / conversion ---
       products: z.array(reference('products')).default([]),
+      // The overall "our pick" — gets the yellow marker in quick picks, the
+      // tinted row in the comparison table, and the level-two shadow card.
+      recommendedProduct: reference('products').optional(),
+      // Editorial quick-pick roles for the "If you're in a hurry" box. The role
+      // label (e.g. "Best for large rooms") is what ready-to-buy readers scan.
+      picks: z
+        .array(
+          z.object({
+            role: z.string(),
+            product: reference('products'),
+            note: z.string().optional(),
+          })
+        )
+        .default([]),
       verdict: z.string().optional(),
       faq: z
         .array(z.object({ question: z.string(), answer: z.string() }))
@@ -101,7 +116,7 @@ const authors = defineCollection({
       avatar: image().optional(),
       credentials: z.string().optional(),
       socialLinks: z
-        .array(z.object({ label: z.string(), url: z.string().url() }))
+        .array(z.object({ label: z.string(), url: z.url() }))
         .default([]),
       expertise: z.array(z.enum(CLUSTER_SLUGS)).default([]),
     }),

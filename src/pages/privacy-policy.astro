@@ -1,0 +1,49 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { SITE } from '@lib/site';
+const meta = {
+  title: `Privacy policy — ${SITE.name}`,
+  description: 'What data this site collects, why, and your choices.',
+  path: '/privacy-policy/',
+};
+---
+<BaseLayout meta={meta}>
+  <article class="prose">
+    <h1>Privacy policy</h1>
+    <p style="color:var(--color-muted)">
+      This is a privacy-conscious starter policy, not legal advice. It must be reviewed against
+      the laws that apply to your audience and the tools you actually run before launch. See
+      docs/GTM_GA4_SETUP.md and Section 9 of the build brief.
+    </p>
+
+    <h2>What we collect</h2>
+    <p>
+      {SITE.name} is a static website. We don't ask you to create an account and we don't
+      collect names, emails, or payment details through the site itself.
+    </p>
+    <p>
+      If analytics is enabled, we use Google Analytics 4 (loaded through Google Tag Manager) to
+      understand, in aggregate, which articles are read and which links are clicked. This uses
+      cookies or similar identifiers. We configure it to avoid collecting personal information
+      such as emails, names, or phone numbers, and affiliate-click tracking records only the
+      link, its position, and the product — never anything about you personally.
+    </p>
+
+    <h2>Affiliate links</h2>
+    <p>
+      When you click an Amazon link and visit Amazon, Amazon's own privacy policy and cookies
+      apply. See our <a href="/affiliate-disclosure/">affiliate disclosure</a>.
+    </p>
+
+    <h2>Your choices</h2>
+    <p>
+      You can block cookies and analytics in your browser; the site remains fully functional
+      with analytics blocked. If your audience is in a region that requires consent before
+      analytics runs (for example the EU/UK), a consent banner is required — this starter does
+      not ship one. See the setup docs for how to add a consent management platform to GTM.
+    </p>
+
+    <h2>Contact</h2>
+    <p>Questions about privacy? <a href="/contact/">Contact us</a>.</p>
+  </article>
+</BaseLayout>

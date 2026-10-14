@@ -1,0 +1,56 @@
+---
+/**
+ * Category page — one per content cluster (Section 3C). Lists the cluster's
+ * articles, with its pillar guide highlighted at the top when published.
+ */
+import { CLUSTERS, getCluster } from '@lib/clusters';
+import { getArticlesByCategory, getPillarForCluster } from '@lib/content';
+import type { ClusterSlug } from '@lib/clusters';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Breadcrumbs from '@components/layout/Breadcrumbs.astro';
+import type { Crumb } from '@components/layout/Breadcrumbs.astro';
+import ArticleGrid from '@components/blog/ArticleGrid.astro';
+import BlogCard from '@components/blog/BlogCard.astro';
+import { breadcrumbJsonLd } from '@lib/seo';
+import { SITE } from '@lib/site';
+
+export async function getStaticPaths() {
+  return CLUSTERS.map((c) => ({ params: { slug: c.slug } }));
+}
+
+const slug = Astro.params.slug as ClusterSlug;
+const cluster = getCluster(slug)!;
+const articles = (await getArticlesByCategory(slug)).filter((a) => !a.noindex);
+const pillar = await getPillarForCluster(slug);
+const rest = articles.filter((a) => a.id !== pillar?.id);
+
+const crumbs: Crumb[] = [
+  { name: 'Home', href: '/' },
+  { name: cluster.label, href: `/category/${slug}/` },
+];
+
+const meta = {
+  title: `${cluster.label} — ${SITE.name}`,
+  description: cluster.description,
+  path: `/category/${slug}/`,
+};
+const jsonLd = [breadcrumbJsonLd(crumbs, Astro.site)];
+---
+<BaseLayout meta={meta} jsonLd={jsonLd}>
+  <div class="grid gap-6">
+    <Breadcrumbs crumbs={crumbs} />
+    <header class="grid gap-2">
+      <h1 class="m-0 text-2xl">{cluster.label}</h1>
+      <p class="m-0 measure" style="color:var(--color-muted)">{cluster.description}</p>
+    </header>
+
+    {pillar && (
+      <section class="grid gap-3" aria-label="Start here">
+        <h2 class="m-0 text-sm uppercase tracking-wide" style="color:var(--color-muted)">Start here</h2>
+        <BlogCard article={pillar} priority />
+      </section>
+    )}
+
+    <ArticleGrid articles={rest} emptyMessage="No articles in this category yet." />
+  </div>
+</BaseLayout>

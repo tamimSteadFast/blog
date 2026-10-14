@@ -1,0 +1,36 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { SITE } from '@lib/site';
+const meta = {
+  title: `Terms of use — ${SITE.name}`,
+  description: 'The terms under which you may use this website.',
+  path: '/terms/',
+};
+---
+<BaseLayout meta={meta}>
+  <article class="prose">
+    <h1>Terms of use</h1>
+    <p style="color:var(--color-muted)">
+      This is a starter template, not legal advice. Review it with the laws that apply to you
+      before launch.
+    </p>
+    <h2>Use of content</h2>
+    <p>
+      The content on {SITE.name} is provided for general information. We work to keep it
+      accurate, but we make no warranty that it is complete or current — product specifications
+      and availability change, which is one reason we don't print prices.
+    </p>
+    <h2>No professional advice</h2>
+    <p>
+      Nothing here is professional, medical, or legal advice. Air quality needs vary; use your
+      own judgement and consult a qualified professional where appropriate.
+    </p>
+    <h2>External links</h2>
+    <p>
+      We link to third-party sites, including Amazon. We aren't responsible for their content or
+      practices. See our <a href="/affiliate-disclosure/">affiliate disclosure</a>.
+    </p>
+    <h2>Changes</h2>
+    <p>We may update these terms. Continued use of the site means you accept the current version.</p>
+  </article>
+</BaseLayout>

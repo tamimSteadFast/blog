@@ -1,0 +1,52 @@
+---
+/**
+ * Quick picks (Caliper). "If you're in a hurry" box placed above the fold on
+ * every roundup, so ready-to-buy readers don't have to scroll. The role label
+ * is what readers scan for, so it LEADS each row. Only the top pick wears the
+ * yellow marker.
+ */
+import type { Product } from '@lib/content';
+import AffiliateLink from './AffiliateLink.astro';
+
+export interface Pick {
+  /** "Best overall", "Best for large rooms", "Best on a budget", … */
+  role: string;
+  product: Product;
+  /** One line on why. */
+  note?: string;
+  recommended?: boolean;
+}
+
+interface Props {
+  picks: Pick[];
+  cluster?: string;
+  /** e.g. "Six units tested". */
+  summary?: string;
+}
+const { picks, cluster, summary } = Astro.props;
+---
+<section class="card p-5" aria-labelledby="quickpicks-heading">
+  <div class="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+    <h2 id="quickpicks-heading" class="m-0 text-lg">If you're in a hurry</h2>
+    {summary && <span class="text-sm" style="color:var(--color-muted)">{summary}</span>}
+  </div>
+
+  <ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-3">
+    {picks.map((p) => (
+      <li
+        class="card grid gap-2 p-4"
+        style={p.recommended ? 'border:2px solid var(--color-signal)' : ''}
+      >
+        <span class="chip w-fit" style={p.recommended ? 'color:var(--color-ink)' : ''}>
+          {p.recommended && <span class="signal-square mr-1" aria-hidden="true"></span>}
+          {p.role}
+        </span>
+        <p class="m-0 font-bold">{p.product.name}</p>
+        {p.note && <p class="m-0 text-sm" style="color:var(--color-muted)">{p.note}</p>}
+        <div class="mt-1">
+          <AffiliateLink product={p.product} position="quick_picks" cluster={cluster} label="Check price" block />
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>

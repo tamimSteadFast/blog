@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Caliper Air">
+  <rect width="32" height="32" rx="6" fill="#0F6E7A" />
+  <!-- caliper jaws -->
+  <path d="M8 7v18M8 7h4M8 25h4" fill="none" stroke="#E9EDF0" stroke-width="2.4" stroke-linecap="round" />
+  <path d="M20 7v18M20 7h-4M20 25h-4" fill="none" stroke="#E9EDF0" stroke-width="2.4" stroke-linecap="round" />
+  <!-- signal reading -->
+  <rect x="13" y="14" width="6" height="4" rx="1" fill="#FFCE1F" />
+</svg>

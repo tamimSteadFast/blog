@@ -1,0 +1,25 @@
+---
+/**
+ * Verdict (Caliper). Sits directly under the article title: one paragraph, one
+ * recommendation, one condition under which it changes. NO yellow here — the
+ * verdict is editorial, not commercial.
+ */
+interface Props {
+  verdict: string;
+  /** e.g. "Tested in a 28 m² room over six weeks". */
+  testedNote?: string;
+  lastReviewed?: Date;
+}
+const { verdict, testedNote, lastReviewed } = Astro.props;
+const dateFmt = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
+const metaParts = [testedNote, lastReviewed && `Last reviewed ${dateFmt.format(lastReviewed)}`].filter(
+  Boolean
+);
+---
+<section class="card p-5" aria-labelledby="verdict-heading">
+  <h2 id="verdict-heading" class="m-0 mb-2 text-lg">Our verdict</h2>
+  <p class="measure m-0 text-base" style="line-height:1.6">{verdict}</p>
+  {metaParts.length > 0 && (
+    <p class="m-0 mt-3 text-xs" style="color:var(--color-muted)">{metaParts.join(' · ')}</p>
+  )}
+</section>

@@ -1,0 +1,78 @@
+---
+/**
+ * Product card (Caliper). Image, role label, name, bestFor, key specs,
+ * pros/cons, and a CTA that routes through AffiliateLink. The recommended card
+ * gets a yellow border and the system's ONLY level-two shadow, so the hierarchy
+ * is unmissable without being loud.
+ *
+ * Carries data-product-card + data-asin for the view_product_card impression
+ * event (AffiliateTracking.astro).
+ */
+import { Image } from 'astro:assets';
+import type { Product } from '@lib/content';
+import AffiliateLink from './AffiliateLink.astro';
+import ProsCons from './ProsCons.astro';
+
+interface Props {
+  product: Product;
+  cluster?: string;
+  /** Role label, e.g. "Best overall", "Best on a budget". */
+  role?: string;
+  recommended?: boolean;
+}
+const { product, cluster, role, recommended = false } = Astro.props;
+const topSpecs = product.keySpecs.slice(0, 3);
+---
+<article
+  class:list={['card overflow-hidden']}
+  style={recommended
+    ? 'border:2px solid var(--color-signal);box-shadow:var(--shadow-pick)'
+    : ''}
+  data-product-card
+  data-asin={product.asin}
+  data-link-position="product_card"
+>
+  {product.image ? (
+    <Image
+      src={product.image}
+      alt={product.imageAlt}
+      width={640}
+      height={480}
+      loading="lazy"
+      class="aspect-[4/3] w-full object-cover"
+    />
+  ) : (
+    <div
+      class="flex aspect-[4/3] w-full items-center justify-center text-xs"
+      style="background:var(--color-paper);color:var(--color-muted)"
+    >
+      Product photo, 4:3
+    </div>
+  )}
+
+  <div class="grid gap-3 p-4">
+    {role && <span class="chip w-fit">{role}</span>}
+    <h3 class="m-0 text-lg">{product.name}</h3>
+    <p class="m-0 text-sm" style="color:var(--color-muted)">{product.bestFor}</p>
+
+    {topSpecs.length > 0 && (
+      <dl class="m-0 grid gap-1">
+        {topSpecs.map((s) => (
+          <div class="flex justify-between gap-3 text-sm" style="border-bottom:1px solid var(--color-rule);padding-block:0.25rem">
+            <dt style="color:var(--color-muted)">{s.label}</dt>
+            <dd class="m-0 font-semibold" style="font-variant-numeric:tabular-nums">{s.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )}
+
+    <ProsCons pros={product.pros} cons={product.cons} compact />
+
+    <div class="mt-1 grid gap-1">
+      <AffiliateLink product={product} position="product_card" cluster={cluster} block />
+      <p class="m-0 text-xs" style="color:var(--color-muted)">
+        Paid link. We don't print prices because they move.
+      </p>
+    </div>
+  </div>
+</article>
